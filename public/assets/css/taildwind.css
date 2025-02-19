@@ -1,0 +1,21 @@
+
+      /* Custom scrollbar transparan */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(223, 222, 222, 0.2);
+        /* Transparan */
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(196, 196, 196, 0.3);
+        /* Hover lebih gelap */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+        /* Track transparan */
+      }

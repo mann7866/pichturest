@@ -97,7 +97,105 @@
 
                     </div>
 
+
+
+
+
+
+                    <h1>ini komwntR</h1>
+                    @foreach ($comments as $comment)
+                        <article class="p-6 mb-3 text-xs border-t border-gray-200">
+                            <footer class="flex justify-between items-center mb-2">
+                                <div class="flex items-center space-x-4">
+                                    <a href="">
+                                        <p class="inline-flex items-center text-sm text-gray-900 font-semibold">
+                                            <img class="mr-2 w-6 h-6 rounded-full"
+                                                src="{{ $comment->user->profile_picture ?? 'default.jpg' }}"
+                                                alt="{{ $comment->user->name }}">
+                                            {{ $comment->user->name }}
+                                        </p>
+                                    </a>
+                                    <p class="text-sm text-gray-600">
+                                        <time
+                                            datetime="{{ $comment->created_at }}">{{ $comment->created_at->diffForHumans() }}</time>
+                                    </p>
+                                </div>
+                            </footer>
+
+                            <p class="text-gray-500">{{ $comment->comment }}</p>
+
+                            <!-- Button Balas dengan Alpine.js -->
+                            <div class="mt-2" x-data="{ showReplyForm: false }">
+                                <button @click="showReplyForm = !showReplyForm" class="text-blue-500 text-sm">Balas</button>
+
+                                <!-- Form Reply -->
+                                <div x-show="showReplyForm" class="mt-2">
+                                    <form action="/comment" method="POST" class="flex flex-col space-y-2">
+                                        @csrf
+                                        <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                                        <input type="hidden" name="post_id" value="{{ $post->id }}">
+                                        <textarea name="comment" class="w-full p-2 border border-gray-300 rounded-md" rows="2"
+                                            placeholder="Tulis balasan..."></textarea>
+                                        <div class="flex justify-end space-x-2">
+                                            <button type="submit"
+                                                class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">Kirim</button>
+                                            <button type="button" @click="showReplyForm = false"
+                                                class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition">Batal</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Tampilkan Reply Secara Rekursif -->
+                            @if ($comment->replies)
+                                @foreach ($comment->replies as $comment)
+                                    <article class="p-4 mb-3 text-xs border-l-2 border-gray-200 ml-4">
+                                        <footer class="flex justify-between items-center mb-2">
+                                            <div class="flex items-center space-x-4">
+                                                <p class="inline-flex items-center text-sm text-gray-900 font-semibold">
+                                                    <img class="mr-2 w-6 h-6 rounded-full"
+                                                        src="{{ $comment->user->profile_picture ?? 'default.jpg' }}"
+                                                        alt="{{ $comment->user->name }}">
+                                                    {{ $comment->user->name }}
+                                                </p>
+                                                <p class="text-sm text-gray-600">
+                                                    <time
+                                                        datetime="{{ $comment->created_at }}">{{ $comment->created_at->diffForHumans() }}</time>
+                                                </p>
+                                            </div>
+                                        </footer>
+
+                                        <p class="text-gray-500">{{ $comment->comment }}</p>
+
+                                        <!-- Tombol Balas -->
+                                        <button @click="reply = !reply" class="text-blue-500 text-sm">Balas</button>
+
+                                        <!-- Form Reply -->
+                                        <div x-show="reply" class="mt-2">
+                                            <form action="/comment" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                                                <input type="hidden" name="post_id" value="{{ $post->id }}">
+                                                <textarea name="comment" class="w-full p-2 border border-gray-300 rounded-md" rows="2"
+                                                    placeholder="Tulis balasan..."></textarea>
+                                                <div class="flex gap-2 justify-end mt-2">
+                                                    <button type="submit"
+                                                        class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600">Simpan</button>
+                                                    <button @click="reply = false"
+                                                        class="bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600">Batal</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                @endforeach
+                            @endif
+                        </article>
+                    @endforeach
+
+
+
+
                     <!-- komentar -->
+
                     <section x-data="{ expanded: false }" class="bg-white mt-0 py-8 lg:py-16 antialiased">
                         <div class="flex justify-between">
                             <label>Komentar</label>
@@ -141,8 +239,9 @@
                                         <div x-data="{ open: false }" class="relative inline-block text-left ml-auto">
                                             <button @click="open = !open"
                                                 class="inline-flex items-center p-2 text-sm font-medium text-gray-500 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50">
-                                                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                    fill="currentColor" viewBox="0 0 16 3">
+                                                <svg class="w-4 h-4" aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                    viewBox="0 0 16 3">
                                                     <path
                                                         d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
                                                 </svg>
@@ -402,8 +501,9 @@
                         </div>
                         <!-- Form Tambah Komentar -->
                         <div class="mt-4 bg-gray-100 py-2 px-2 rounded-full">
-                            <form action="" class="flex items-center">
-                                <input type="hidden" name="galeries_id" value="">
+                            <form action="/comment" method="POST" class="flex items-center">
+                                @csrf
+                                <input type="hidden" name="post_id" value="{{ $post->id }}">
                                 <textarea name="comment" id="comment"
                                     class="w-full focus:outline-none text-gray-700 py-2 px-4 h-10 rounded-full overflow-hidden resize-none"
                                     placeholder="Tambahkan komentar"></textarea>
@@ -481,6 +581,7 @@
     {{--
 
     /controller/
+<time datetime="{{ $comment->created_at }}">{{ $comment->created_at->diffForHumans() }}</time>
 
                      $comments = Comment::whereNull('parent_id')->with('replies')->get();
                      $comments = $post->comments()->whereNull('parent_id')->with('replies')->get();
@@ -489,8 +590,8 @@
 //viewBox
 <p>{{ $comment->content }}</p>
 
-@if($comment->replies)
-    @foreach($comment->replies as $reply)
+@if ($comment->replies)
+    @foreach ($comment->replies as $reply)
         <div style="margin-left: 20px;">
             @include('comment', ['comment' => $reply])
         </div>
@@ -501,24 +602,24 @@
 atau
 
 
-@foreach($post->comments as $comment)
+@foreach ($post->comments as $comment)
     {{-- Komentar pertama (tanpa reply) --}}
     {{--  <p>{{ $comment->content }}</p>  --}}
 
     {{-- Jika komentar memiliki reply --}}
-    {{--  @if($comment->replies)
-        @foreach($comment->replies as $reply)
+    {{--  @if ($comment->replies)
+        @foreach ($comment->replies as $reply)
             <p>-- {{ $reply->content }}</p> {{-- Indentasi untuk menunjukkan reply --}}
-        {{--  @endforeach
+    {{--  @endforeach
     @endif
 @endforeach  --}}
 
 
 
-//model
+    //model
 
 
- {{--   public function comments()
+    {{--   public function comments()
     {
         return $this->hasMany(Comment::class);
     }
@@ -554,10 +655,10 @@ atau
 
 
 
-    @foreach($albums as $album)
+    @foreach ($albums as $album)
     <h2>Album: {{ $album->name }}</h2>
     <ul>
-        @foreach($album->posts as $post)
+        @foreach ($album->posts as $post)
             <li>{{ $post->title }}</li>
         @endforeach
     </ul>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Album;
+use App\Models\Comment;
 use App\Models\Keywords;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -73,9 +74,13 @@ class PostController extends Controller
      */
     public function show($id_unik)
     {
-        $post = Post::where('id_unik',$id_unik)->get();
+        $post = Post::where('id_unik',$id_unik)->first();
         $posts = Post::latest()->where('users_id', Auth::id())->get();
-        return view('pages.profile.show',compact('post','posts'));
+        $comments = Comment::where('post_id', $post->id)
+                    ->whereNull('parent_id')
+                    ->with('replies')
+                    ->get();
+        return view('pages.profile.show',compact('post','posts','comments'));
     }
 
     /**
